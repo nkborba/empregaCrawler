@@ -2,11 +2,13 @@ from bs4 import BeautifulSoup as soup
 from urllib.request import urlopen
 import csv
 
-#INSIDE FILTROS YOU PUT THE VACCANCIE KEYWORD YOU WANT TO SEARCH
-filtros = ['BEBIDAS', 'ASSISTENTE', 'VENDEDOR', 'OPERADOR', 'GERAIS', 'SERVIÇOS']
+# INSIDE FILTROS YOU PUT THE VACCANCIE KEYWORD YOU WANT TO SEARCH
+filtros = ['ASSISTENTE', 'OPERADOR', 'GERAIS', 'SERVIÇOS']
+cidades = ['CAMPINAS']
 
-#THIS IS HOW WE PREPARE A FILE TO RECEIVE OUR EXTRACTED DATA
+# THIS IS HOW WE PREPARE A FILE TO RECEIVE OUR EXTRACTED DATA
 planilha = csv.writer(open('vagas.csv', 'w'))
+
 
 def pegaVagas(paginasMax):
 
@@ -15,7 +17,8 @@ def pegaVagas(paginasMax):
 
     for i in range(paginasMax):
 
-        page = 'http://empregacampinas.com.br/categoria/vaga/page/' + str(count)
+        page = 'http://empregacampinas.com.br/categoria/vaga/page/' + \
+            str(count)
         pageLoad = urlopen(page)
         pageCode = pageLoad.read()
         pageLoad.close()
@@ -31,16 +34,19 @@ def pegaVagas(paginasMax):
                 vagaLink = vaga.find('a', {'class': 'thumbnail'}).get('href')
 
                 listaDinamica = vagaCargo.split()
+                # print(listaDinamica)
 
-                if any(palavra in filtros for palavra in listaDinamica):
-                    planilha.writerow([vagaCargo, vagaLink])
-                    total+=1
-                    # print(vagaCargo)
-                    # print(vagaLink + '\n')
+                if any(cidade in cidades for cidade in listaDinamica):
+                    if any(palavra in filtros for palavra in listaDinamica):
+                        planilha.writerow([vagaCargo, vagaLink])
+                        total += 1
+                        print(vagaCargo)
+                        # print(vagaLink + '\n')
             except:
                 continue
-        count+=1
-    print(total,'vagas foram encontradas. Boa sorte!')
+        count += 1
+    print(total, 'vagas foram encontradas. Boa sorte!')
 
-#INSERT AMOUNT OF PAGES YOU WANT TO EXPLORE
-pegaVagas(20)
+
+# INSERT AMOUNT OF PAGES YOU WANT TO EXPLORE
+pegaVagas(40)
